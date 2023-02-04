@@ -14,6 +14,12 @@ if 'key' not in st.session_state:
 # Session State also supports the attribute based syntax
 if 'key' not in st.session_state:
     st.session_state.key = 'value'
+
+# Store the initial value of widgets in session state
+if "visibility" not in st.session_state:
+    st.session_state.visibility = "visible"
+    st.session_state.disabled = False
+
 # st.title('This is a title')
 st.title('Search By _File_ : :blue[GOES] Data')
 st.subheader("Please select your Search Criteria")
@@ -69,14 +75,12 @@ st.title('Search By _FileName_ : :blue[GOES] Data')
 st.subheader("Please input your File Name")
 # Text input :
 
-file_input = st.text_input(
-        "Enter some text 👇",
-         label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,
-        placeholder=st.session_state.placeholder,
-    )
+file_input = st.text_input('File Name','' )
+
 
 if file_input:
-        st.write("You entered: ", file_input)
+        st.write("File name entered: ", file_input)
+else:
+        st.write('')
 
 
