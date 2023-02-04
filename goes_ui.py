@@ -2,9 +2,22 @@
 import pandas as pd
 import numpy as mp
 import streamlit as st
+
+
+import streamlit as st
+
+# Check if 'key' already exists in session_state
+# If not, then initialize it
+if 'key' not in st.session_state:
+    st.session_state['key'] = 'value'
+
+# Session State also supports the attribute based syntax
+if 'key' not in st.session_state:
+    st.session_state.key = 'value'
 # st.title('This is a title')
 st.title('Search By _File_ : :blue[GOES] Data')
 st.subheader("Please select your Search Criteria")
+
 ## Data for the dropdown
 data = [10,20,21,22,15,60]
   
