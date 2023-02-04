@@ -7,6 +7,7 @@
 import unittest
 import re
 import streamlit as st
+import sqlite3 as sql
 
 
 def get_aws_file_url(base_url, filename):
@@ -24,9 +25,9 @@ def get_aws_file_url(base_url, filename):
     time = y[3]
     year = time[1:5]
     day = time[5:8]
-    date = time[8:10]
+    hour = time[8:10]
     # combining all pieces of url
-    output = base_url + res + '/' + year + '/' + day + '/' + date + '/' + filename
+    output = base_url + res + '/' + year + '/' + day + '/' + hour + '/' + filename
     return output
 
 
@@ -52,12 +53,62 @@ def main():
     return filename
 
 
+def db_env_create():
+    # create sql lite 3 database
+    conn = sql.connect('GOESmetadata.db')
+    cursor = conn.cursor()
+    cursor.execute('''DROP TABLE IF EXISTS GOESmetadataTable''')
+    cursor.execute(''' CREATE TABLE GOESmetadataTable (
+             year INTEGER NOT NULL, 
+             day INTEGER NOT NULL, 
+             hour INTEGER NOT NULL
+             ); ''')
+    return conn, cursor
+
+def insert_data_in_table(cursor, year, day, hour):
+    insert_str = "INSERT INTO GOESmetadataTable(year,day,hour) \
+        VALUES ('" + year + "','" + day + "','" + hour + "'); "
+    cursor.execute(insert_str)
+
+
+def take_input_from_user():
+    year = st.text_input('Year:', '')
+    day = st.text_input('Day:', '')
+    hour = st.text_input('Hour:', '')
+
+    return year, day, hour
+
+def print_data_from_sql(cursor):
+    select = cursor.execute("SELECT year, day, hour FROM GOESmetadataTable limit 5")
+    for row in select:
+        print("YEAR=", row[0], "DAY=", row[1], "HOUR=", row[2])
+
+def db_conn_close(conn):
+    conn.commit()
+    print('Data entered successfully.')
+    conn.close()
+    if (conn):
+        conn.close()
+        print("The SQLite connection is closed.")
+
 # declarations
 base_url = "https://noaa-goes18.s3.amazonaws.com/"
+# create table in database
+conn, cursor = db_env_create()
 filename1 = main()
 x = get_aws_file_url(base_url, filename1)
 st.write('Click on the link below to download this file!')
 st.write(x)
+print()
+print()
+st.write('test case 2: take metadata input from file')
+year, day, hour = take_input_from_user()
+#add metadata into sqlite3
+insert_data_in_table(cursor, year, day, hour)
+#print data on console from sql db
+print_data_from_sql(cursor)
+#stop
+db_conn_close(conn)
 
 # test_files = ['OR_ABI-L1b-RadC-M6C01_G18_s20230020101172_e20230020103548_c20230020103594.nc',
 #              'OR_ABI-L2-ACMM1-M6_G18_s20230090504262_e20230090504319_c20230090505026.nc',
