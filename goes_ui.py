@@ -63,7 +63,7 @@ st.write('You selected:', hour)
 ## Button code :
 
 if st.button('Generate the link'):
-    st.write('EXAMPLE__LINK')
+    st.write(' ')
 else:
     st.write('Look at me :::)) ')
 
