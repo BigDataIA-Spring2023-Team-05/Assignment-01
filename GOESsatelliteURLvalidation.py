@@ -10,7 +10,7 @@ import streamlit as st
 import sqlite3 as sql
 
 
-def get_goes_aws_file_url(base_url, filename):
+def get_aws_file_url(base_url, filename):
     y = filename.split('_')
     # print(y)
     filename_pattern = r'(.*)-(.*)'
@@ -63,40 +63,15 @@ def db_env_create():
              day INTEGER NOT NULL, 
              hour INTEGER NOT NULL
              ); ''')
-    # cursor.execute('''DROP TABLE IF EXISTS NEXRADmetadataTable''')
-    cursor.execute(''' CREATE TABLE NEXRADmetadataTable (
-                 year INTEGER NOT NULL, 
-                 day INTEGER NOT NULL, 
-                 hour INTEGER NOT NULL
-                 ); ''')
-    # metadata2 FOR NEXRAD
-    cursor.execute(''' CREATE TABLE NEXRADmetadataTableWithLatLong (
-                     name VARCHAR NOT NULL,
-                     county VARCHAR NOT NULL, 
-                     lat INTEGER NOT NULL,
-                     Longi INTEGER NOT NULL,
-                     elev INTEGER NOT NULL,
-                     ); ''')
     return conn, cursor
 
-def insert_data_in_table_goes(cursor, year, day, hour):
+def insert_data_in_table(cursor, year, day, hour):
     insert_str = "INSERT INTO GOESmetadataTable(year,day,hour) \
         VALUES ('" + year + "','" + day + "','" + hour + "'); "
     cursor.execute(insert_str)
 
-def insert_data_in_table_nexrad(cursor, year, day, hour):
-    insert_str = "INSERT INTO NEXRADmetadataTable(year,day,hour) \
-        VALUES ('" + year + "','" + day + "','" + hour + "'); "
-    cursor.execute(insert_str)
 
-def take_input_from_user_goes():
-    year = st.text_input('Year:', '')
-    day = st.text_input('Day:', '')
-    hour = st.text_input('Hour:', '')
-
-    return year, day, hour
-
-def take_input_from_user_nexrad():
+def take_input_from_user():
     year = st.text_input('Year:', '')
     day = st.text_input('Day:', '')
     hour = st.text_input('Hour:', '')
@@ -121,15 +96,15 @@ base_url = "https://noaa-goes18.s3.amazonaws.com/"
 # create table in database
 conn, cursor = db_env_create()
 filename1 = main()
-x = get_goes_aws_file_url(base_url, filename1)
+x = get_aws_file_url(base_url, filename1)
 st.write('Click on the link below to download this file!')
 st.write(x)
 print()
 print()
 st.write('test case 2: take metadata input from file')
-year, day, hour = take_input_from_user_goes()
+year, day, hour = take_input_from_user()
 #add metadata into sqlite3
-insert_data_in_table_goes(cursor, year, day, hour)
+insert_data_in_table(cursor, year, day, hour)
 #print data on console from sql db
 print_data_from_sql(cursor)
 #stop
