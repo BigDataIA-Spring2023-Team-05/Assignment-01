@@ -31,24 +31,24 @@ target_bucket = s3.Bucket(team_source_bucket)
 
 
 # %%
-def get_all_files_name_by_filter(station, year, day, hour):
+def get_all_geos_file_name_by_filter(station, year, day, hour):
     files_available=[]
     
-    for object_summary in src_bucket.objects.filter(Prefix=  station + '/' + str(year) + '/' + day +'/' + hour + '/'):
+    for object_summary in src_bucket.objects.filter(Prefix=  f'{station}/{year}/{day}/{hour}/'):
         files_available.append(object_summary.key.split('/')[-1])
 
     return files_available
 
 
 # %%
-def get_all_aws_link(station, year, day, hour, filename):
+def get_geos_aws_link(station, year, day, hour, filename):
     # Stations, Year, Day, Hour
     copy_source = {
         'Bucket': goes_source_bucket,
-        'Key': station + '/' + str(year) + '/' + day +'/' + hour + '/' + filename
+        'Key': f'{station}/{year}/{day}/{hour}/{filename}'
     }
 
     target_bucket.copy(copy_source, station + '/' + str(year) + '/' + day +'/' + hour + '/' + filename)
 
-    return f'https://damg7245-team-5.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}'
+    return f'https://damg7245-team-5.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}', f'https://noaa-goes18.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}'
 
