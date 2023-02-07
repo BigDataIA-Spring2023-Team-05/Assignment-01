@@ -5,12 +5,44 @@
 # #filename_2 = 'OR_ABI-L1b-RadM1-M6C01_G18_s20230030201252_e20230030201311_c20230030201340.nc'
 
 import unittest
+import pandas as pd
 import re
 import streamlit as st
 import sqlite3 as sql
+### Importing MAPS DATA:
+def load_data(nrows):
+    data = pd.read_fwf('https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt', nrows=nrows)
+    lowercase = lambda x: str(x).lower()
+    data.rename(lowercase, axis='columns', inplace=True)
+    data = data.drop(index = 0,axis = 0)
+    # data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
+    return data
+# data = pd.read_csv(nexrad-stations.txt)
+data = load_data(100000)
 
+df = pd.DataFrame()
+df['name']=data['name']
+df['county']=data['county']
+df['lat'] = data['lat']
+df['lon'] = data['lon']
+df['elev'] = data['elev']
 
-def get_aws_file_url(base_url, filename):
+def map_data_tbl():
+    table_name = 'Mapdata'
+    conn = sql.connect('GOESmetadata.db')
+    cursor = conn.cursor()
+    query = f'Create table if not Exists {table_name} (Name,County,Lat,Lon,Elev)'
+    cursor.execute(query)
+    df.to_sql(table_name,conn,if_exists='replace',index=False)
+    conn.commit()
+    return conn,cursor
+
+def print_data_from_sql(cursor):
+    select = cursor.execute("SELECT Name,County,Lat,Lon,Elev FROM Mapdata limit 5")
+    for row in select:
+        print("Name=", row[0], "County=", row[1], "Elev=", row[2])
+    
+def get_goes_aws_file_url(base_url, filename):
     y = filename.split('_')
     # print(y)
     filename_pattern = r'(.*)-(.*)'
@@ -63,15 +95,33 @@ def db_env_create():
              day INTEGER NOT NULL, 
              hour INTEGER NOT NULL
              ); ''')
+    # cursor.execute('''DROP TABLE IF EXISTS NEXRADmetadataTable''')
+    cursor.execute(''' CREATE TABLE if not exists NEXRADmetadataTable (
+                 year INTEGER NOT NULL, 
+                 day INTEGER NOT NULL, 
+                 hour INTEGER NOT NULL
+                 ); ''')
+    
     return conn, cursor
 
-def insert_data_in_table(cursor, year, day, hour):
+def insert_data_in_table_goes(cursor, year, day, hour):
     insert_str = "INSERT INTO GOESmetadataTable(year,day,hour) \
         VALUES ('" + year + "','" + day + "','" + hour + "'); "
     cursor.execute(insert_str)
 
+def insert_data_in_table_nexrad(cursor, year, day, hour):
+    insert_str = "INSERT INTO NEXRADmetadataTable(year,day,hour) \
+        VALUES ('" + year + "','" + day + "','" + hour + "'); "
+    cursor.execute(insert_str)
 
-def take_input_from_user():
+def take_input_from_user_goes():
+    year = st.text_input('Year:', '')
+    day = st.text_input('Day:', '')
+    hour = st.text_input('Hour:', '')
+
+    return year, day, hour
+
+def take_input_from_user_nexrad():
     year = st.text_input('Year:', '')
     day = st.text_input('Day:', '')
     hour = st.text_input('Hour:', '')
@@ -96,15 +146,15 @@ base_url = "https://noaa-goes18.s3.amazonaws.com/"
 # create table in database
 conn, cursor = db_env_create()
 filename1 = main()
-x = get_aws_file_url(base_url, filename1)
+x = get_goes_aws_file_url(base_url, filename1)
 st.write('Click on the link below to download this file!')
 st.write(x)
 print()
 print()
 st.write('test case 2: take metadata input from file')
-year, day, hour = take_input_from_user()
+year, day, hour = take_input_from_user_goes()
 #add metadata into sqlite3
-insert_data_in_table(cursor, year, day, hour)
+insert_data_in_table_goes(cursor, year, day, hour)
 #print data on console from sql db
 print_data_from_sql(cursor)
 #stop
