@@ -29,7 +29,7 @@ df['elev'] = data['elev']
 
 def map_data_tbl():
     table_name = 'Mapdata'
-    conn = sql.connect('GOESmetadata.db')
+    conn = sql.connect('../GOESmetadata.db')
     cursor = conn.cursor()
     query = f'Create table if not Exists {table_name} (Name,County,Lat,Lon,Elev)'
     cursor.execute(query)
@@ -87,7 +87,7 @@ def main():
 
 def db_env_create():
     # create sql lite 3 database
-    conn = sql.connect('GOESmetadata.db')
+    conn = sql.connect('../GOESmetadata.db')
     cursor = conn.cursor()
     cursor.execute('''DROP TABLE IF EXISTS GOESmetadataTable''')
     cursor.execute(''' CREATE TABLE GOESmetadataTable (
