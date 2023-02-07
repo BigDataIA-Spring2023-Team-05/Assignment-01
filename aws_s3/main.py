@@ -39,6 +39,7 @@ def get_all_files_name_by_filter(station, year, day, hour):
 
     return files_available
 
+
 # %%
 def get_all_aws_link(station, year, day, hour, filename):
     # Stations, Year, Day, Hour
@@ -51,9 +52,3 @@ def get_all_aws_link(station, year, day, hour, filename):
 
     return f'https://damg7245-team-5.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}'
 
-# %%
-
-get_all_files_name_by_filter('ABI-L1b-RadC', 2023, '029', '01')
-
-# %%
-get_all_aws_link('ABI-L1b-RadC', 2023, '029', '01', 'OR_ABI-L1b-RadC-M6C01_G18_s20230290131183_e20230290133559_c20230290134003.nc')
