@@ -92,4 +92,11 @@ if file_input:
 else:
         st.write('')
 
+## Button code :
+
+if st.button('Search'):
+    st.write(' ')
+else:
+    st.write('Enter your file name again')
+
 
