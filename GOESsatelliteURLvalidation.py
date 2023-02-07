@@ -5,11 +5,43 @@
 # #filename_2 = 'OR_ABI-L1b-RadM1-M6C01_G18_s20230030201252_e20230030201311_c20230030201340.nc'
 
 import unittest
+import pandas as pd
 import re
 import streamlit as st
 import sqlite3 as sql
+### Importing MAPS DATA:
+def load_data(nrows):
+    data = pd.read_fwf('https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt', nrows=nrows)
+    lowercase = lambda x: str(x).lower()
+    data.rename(lowercase, axis='columns', inplace=True)
+    data = data.drop(index = 0,axis = 0)
+    # data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
+    return data
+# data = pd.read_csv(nexrad-stations.txt)
+data = load_data(100000)
 
+df = pd.DataFrame()
+df['name']=data['name']
+df['county']=data['county']
+df['lat'] = data['lat']
+df['lon'] = data['lon']
+df['elev'] = data['elev']
 
+def map_data_tbl():
+    table_name = 'Mapdata'
+    conn = sql.connect('GOESmetadata.db')
+    cursor = conn.cursor()
+    query = f'Create table if not Exists {table_name} (Name,County,Lat,Lon,Elev)'
+    cursor.execute(query)
+    df.to_sql(table_name,conn,if_exists='replace',index=False)
+    conn.commit()
+    return conn,cursor
+
+def print_data_from_sql(cursor):
+    select = cursor.execute("SELECT Name,County,Lat,Lon,Elev FROM Mapdata limit 5")
+    for row in select:
+        print("Name=", row[0], "County=", row[1], "Elev=", row[2])
+    
 def get_goes_aws_file_url(base_url, filename):
     y = filename.split('_')
     # print(y)
@@ -64,19 +96,12 @@ def db_env_create():
              hour INTEGER NOT NULL
              ); ''')
     # cursor.execute('''DROP TABLE IF EXISTS NEXRADmetadataTable''')
-    cursor.execute(''' CREATE TABLE NEXRADmetadataTable (
+    cursor.execute(''' CREATE TABLE if not exists NEXRADmetadataTable (
                  year INTEGER NOT NULL, 
                  day INTEGER NOT NULL, 
                  hour INTEGER NOT NULL
                  ); ''')
-    # metadata2 FOR NEXRAD
-    cursor.execute(''' CREATE TABLE NEXRADmetadataTableWithLatLong (
-                     name VARCHAR NOT NULL,
-                     county VARCHAR NOT NULL, 
-                     lat INTEGER NOT NULL,
-                     Longi INTEGER NOT NULL,
-                     elev INTEGER NOT NULL,
-                     ); ''')
+    
     return conn, cursor
 
 def insert_data_in_table_goes(cursor, year, day, hour):

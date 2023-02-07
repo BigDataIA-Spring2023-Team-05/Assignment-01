@@ -4,15 +4,25 @@ import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
 # st.title('This is a title')
+
+### Call the function to pull Map data : 
+import Map_data_table_creation as ck
+conn, cursor = ck.map_data_tbl()
+
+df = pd.read_sql_query("SELECT * from Mapdata", conn)
+
 st.title('A title with _italics_ :blue[colors] and emojis :sunglasses:')
 def load_data(nrows):
-    data = pd.read_fwf('https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt', nrows=nrows)
+    data = pd.read_fwf('https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt', nrows = nrows)
     lowercase = lambda x: str(x).lower()
     data.rename(lowercase, axis='columns', inplace=True)
     data = data.drop(index = 0,axis = 0)
     # data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
     return data
 # data = pd.read_csv(nexrad-stations.txt)
+
+
+
 
 # Create a text element and let the reader know the data is loading.
 data_load_state = st.text('Loading data...')
@@ -24,12 +34,12 @@ data_load_state.text('Loading data...done!')
 st.subheader("Raw data pulled")
 st.write(data) 
 
-df = pd.DataFrame()
-df['name']=data['name']
-df['county']=data['county']
-df['lat'] = data['lat']
-df['lon'] = data['lon']
-df['elev'] = data['elev']
+# df = pd.DataFrame()
+# df['name']=data['name']
+# df['county']=data['county']
+# df['lat'] = data['lat']
+# df['lon'] = data['lon']
+# df['elev'] = data['elev']
 
 st.subheader("Req data :")
 st.write(df) 
