@@ -1,0 +1,9 @@
+setup.py
+awscloud/__init__.py
+awscloud/s3/__init__.py
+awscloud/s3/main.py
+team5.egg-info/PKG-INFO
+team5.egg-info/SOURCES.txt
+team5.egg-info/dependency_links.txt
+team5.egg-info/top_level.txt
+test/test_aws.py
