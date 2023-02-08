@@ -3,6 +3,7 @@ import os
 import boto3
 import boto3.s3
 import botocore
+import re
 from dotenv import load_dotenv
 
 # %%
@@ -52,3 +53,25 @@ def get_geos_aws_link(station, year, day, hour, filename):
 
     return f'https://damg7245-team-5.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}', f'https://noaa-goes18.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}'
 
+
+def get_aws_link_by_filename(filename):
+    y = filename.split('_')
+    # print(y)
+    filename_pattern = r'(.*)-(.*)'
+    regex_pattern = re.compile(filename_pattern)
+    res_fn = regex_pattern.findall(y[1])
+    res = str(res_fn[0][0])
+    end = res[-1]
+    if end.isnumeric():
+        res = res[:-1]
+            # print(res)
+            # get timestamp
+    time = y[3]
+    year = time[1:5]
+    day = time[5:8]
+    date = time[8:10]
+
+    #combining all pieces of url
+    output = "https://noaa-goes18.s3.amazonaws.com/" + res + '/' + year + '/' + day + '/' + date + '/' + filename
+    
+    return output
