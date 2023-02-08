@@ -2,9 +2,9 @@
 import pandas as pd
 import numpy as mp
 import streamlit as st
-
-
+import datetime
 import streamlit as st
+
 
 # Check if 'key' already exists in session_state
 # If not, then initialize it
@@ -42,18 +42,10 @@ station = st.selectbox(
 
 st.write('You selected:', station)
 
-year = st.selectbox(
-    'Select the required Year',
-    list_df)
-
-st.write('You selected:', year)
-
-day = st.selectbox(
-    'Select the required Day',
-    list_df)
-
-st.write('You selected:', day)
-
+d = st.date_input(
+    "When\'s your birthday",
+    datetime.date(2022, 7, 6))
+st.write('Your Selection is:', d)
 hour = st.selectbox(
     'Select the required Hour',
     list_df)
