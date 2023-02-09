@@ -2,6 +2,10 @@ setup.py
 awscloud/__init__.py
 awscloud/s3/__init__.py
 awscloud/s3/main.py
+data/GOESsatelliteURLvalidation.py
+data/Map_data_table_creation.py
+data/__init__.py
+data/sql_aws_metadata.py
 team5.egg-info/PKG-INFO
 team5.egg-info/SOURCES.txt
 team5.egg-info/dependency_links.txt
