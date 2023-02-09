@@ -87,7 +87,8 @@ def goes_ui():
     ## Button code :
 
     if st.button('Generate the link',key = 'goes_file_search'):
-        s3.get_aws_link_by_filename(file_input)
+        file_name = s3.get_aws_link_by_filename(file_input)
+        st.write(file_name)
     else:
         st.write('Look at me :::)) ')
 
