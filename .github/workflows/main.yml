@@ -33,5 +33,9 @@ jobs:
           pip install -e .
 
       - name: Run Testcases
+        env:
+         AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+         AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
+         TARGET_BUCKET_NAME: ${{ secrets.TARGET_BUCKET_NAME }}
         run: | 
           pytest
