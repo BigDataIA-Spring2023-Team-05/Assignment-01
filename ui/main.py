@@ -40,12 +40,9 @@ def goes_ui():
     st.subheader("Please select your Search Criteria")
 
 
-    ## Data for the dropdown
-    data = [10,20,21,22,15,60]
+
     
     # Create the pandas DataFrame with column name is provided explicitly
-    df = pd.DataFrame(data, columns=['Numbers'])
-    list_df = df['Numbers'].tolist()
 
     #----------------------------------------------------------
     # df = pd.read_csv('data.csv')
@@ -77,18 +74,33 @@ def goes_ui():
         hours_list)
 
     st.write('You selected:', hour)
-    hour = hour
-
+    output_files = s3.get_all_geos_file_name_by_filter(station, str(year_goes),str(doy), str(hour))
+    sl_file = st.selectbox('Select the required file for Link',output_files)
     ## Button code :
 
-    if st.button('Generate the link',key = 'goes_field_search'):
-        output = s3.get_all_geos_file_name_by_filter(station, str(year_goes),str(doy), str(hour))
-        print(output)
-        o_df = pd.DataFrame(data = output)
-        print(o_df)
-        st.write(o_df)
+    # if st.button('Search',key = 'goes_file_output'):
+    #     fo1 = s3.get_all_geos_file_name_by_filter(station, str(year_goes),str(doy), str(hour))
+    #     print(fo1)
+        
+    # sl_file = st.selectbox('Select the required file for Link',fo1)
+    if st.button('Generate Link', key ='goes_filed_search'):
+        team_link, goes_link = s3.get_geos_aws_link(station,str(year_goes),str(doy), str(hour),str(sl_file))
+        st.write(team_link)
+        st.write(goes_link)
+        # o_df = pd.DataFrame(data = file_output, columns = ['File Name'])
+        # l = []
+        # for f in file_output:
+        #     temp = s3.get_aws_link_by_filename(f)
+        #     l.append(temp)
+        # print(l)
+        # l_df = pd.DataFrame(data = l,columns = ['File Link'])
+        # fdf = o_df.join(l_df)
+        # print(fdf)
+        # st.write(fdf)
     else:
-        st.write('Look at me :::)) ')
+        st.write(' ')
+
+
 
 
 
@@ -109,7 +121,8 @@ def goes_ui():
     ## Button code :
 
     if st.button('Generate the link',key = 'goes_file_search'):
-        s3.get_aws_link_by_filename(file_input)
+        link = s3.get_aws_link_by_filename(file_input)
+        st.write(link)
     else:
         st.write('Look at me :::)) ')
 
