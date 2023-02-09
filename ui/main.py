@@ -2,6 +2,7 @@ import streamlit as st
 import goes_ui as gu
 import nexrad_ui as nu
 import nexrad_map as nm
+from awscloud.s3 import main as s3
 
 ## Library Imports
 import pandas as pd
@@ -86,7 +87,7 @@ def goes_ui():
     ## Button code :
 
     if st.button('Generate the link',key = 'goes_file_search'):
-        st.write(' ')
+        s3.get_aws_link_by_filename(file_input)
     else:
         st.write('Look at me :::)) ')
 
