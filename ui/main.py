@@ -10,7 +10,14 @@ import numpy as mp
 import streamlit as st
 import datetime
 import streamlit as st
-
+def day_of_year(month, day):
+        days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        total_days = 0
+        for i in range(month - 1):
+            total_days += days_in_month[i]
+        total_days += day
+        return total_days
+hours_list = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
 def goes_ui():
    
     # Check if 'key' already exists in session_state
@@ -45,26 +52,41 @@ def goes_ui():
     # col_one_list = df['one'].tolist()
     # selectbox_01 = st.selectbox('Select', col_one_list)
     #----------------------------------------------------------
-    station = st.selectbox(
-        'Select the required Station',
-        list_df)
+    # station = st.selectbox(
+    #     'Select the required Station',
+    #     list_df)
 
+    
+    station = 'ABI-L1b-RadC'
     st.write('You selected:', station)
-
     d = st.date_input(
         "Select the date",
         datetime.date(2022, 7, 6))
     st.write('Your Selection is:', d)
+    day_goes = d.day
+    month_goes = d.month
+    year_goes = d.year
+    print('day' + ':'+ str(day_goes))
+    print('month' + ':'+ str(month_goes))
+    ## Creating date of the year:
+
+    doy = day_of_year(month_goes,day_goes)
+    print('day of year' + ':'+ str(doy))
     hour = st.selectbox(
         'Select the required Hour',
-        list_df)
+        hours_list)
 
     st.write('You selected:', hour)
+    hour = hour
 
     ## Button code :
 
     if st.button('Generate the link',key = 'goes_field_search'):
-        st.write(' ')
+        output = s3.get_all_geos_file_name_by_filter(station, str(year_goes),str(doy), str(hour))
+        print(output)
+        o_df = pd.DataFrame(data = output)
+        print(o_df)
+        st.write(o_df)
     else:
         st.write('Look at me :::)) ')
 
