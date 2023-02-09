@@ -47,19 +47,23 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2 
+      
+      - name: Executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTNAME }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          
       - name: Deploy in EC2
         env:
             PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
             HOSTNAME : ${{ secrets.HOSTNAME  }}
             USER_NAME : ${{ secrets.USER_NAME  }}
-            
-        run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME}
-          
-            cd /home/ubuntu/Assignment-01 &&
-            rm GOESmetadata.db &&
-            git checkout main &&
-            git fetch --all &&
-            git reset --hard origin/main &&
-            git pull origin main &&
+            script: |
+              cd /home/ubuntu/Assignment-01
+              rm GOESmetadata.db
+              git checkout main
+              git fetch --all
+              git reset --hard origin/main
+              git pull origin main
