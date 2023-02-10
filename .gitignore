@@ -1,6 +1,8 @@
-.env
+awscloud/.env
 __pycache__
 .DS_Store
 *.db
 .venv
 GOESmetadata.db
+myenvBDSIA
+.idea

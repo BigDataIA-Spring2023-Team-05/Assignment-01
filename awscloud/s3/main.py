@@ -39,9 +39,6 @@ def get_all_geos_file_name_by_filter(station, year, day, hour):
     for object_summary in src_bucket.objects.filter(Prefix=  f'{station}/{year}/{day}/{hour}/'):
         files_available.append(object_summary.key.split('/')[-1])
 
-    metadata = Metadata()
-    metadata.insert_data_into_goes(station= station, year=year, day=day, hour=hour)
-
     return files_available
 
 
@@ -54,6 +51,9 @@ def get_geos_aws_link(station, year, day, hour, filename):
     }
 
     target_bucket.copy(copy_source, station + '/' + str(year) + '/' + day +'/' + hour + '/' + filename)
+
+    metadata = Metadata()
+    metadata.insert_data_into_goes(station=station, year=year, day=day, hour=hour)
 
     return f'https://damg7245-team-5.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}', f'https://noaa-goes18.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}'
 

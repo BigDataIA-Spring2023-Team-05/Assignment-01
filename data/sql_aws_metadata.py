@@ -55,8 +55,8 @@ class Metadata:
         self.db_conn_close()
 
 
-    def insert_data_into_nexrad(self, year, day_of_year, hour, station_id):
-        insert_str = f'INSERT INTO "{self.table_name_nexrad}" VALUES("{year}", "{day_of_year}", "{hour}", {station_id}");'
+    def insert_data_into_nexrad(self, year, month, day_of_year, station_id):
+        insert_str = f'INSERT INTO "{self.table_name_nexrad}" VALUES("{year}", "{month}", "{day_of_year}", "{station_id}");'
         self.cursor.execute(insert_str)
         self.db_conn_close()
 
