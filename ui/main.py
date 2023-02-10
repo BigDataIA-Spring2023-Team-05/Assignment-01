@@ -74,7 +74,7 @@ def goes_ui():
     st.write('You selected:', station)
     d = st.date_input(
         "Select the date",
-        value = datetime.date(2022, 7, 28),
+        # value = datetime.date(2022, 7, 28),
         min_value= datetime.date(2022, 7, 28), max_value=date.today())
     st.write('Your Selection is:', d)
     day_goes = d.day
