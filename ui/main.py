@@ -3,6 +3,7 @@ import goes_ui as gu
 import nexrad_ui as nu
 import nexrad_map as nm
 from awscloud.s3 import main as s3
+from awscloud.s3 import nexrad_main as nexs3
 
 ## Library Imports
 import pandas as pd
@@ -18,6 +19,215 @@ def day_of_year(month, day):
         total_days += day
         return total_days
 hours_list = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
+station_id = ['KABR',
+'KABX',
+'KAKQ',
+'KAMA',
+'KAMX',
+'KAPX',
+'KARX',
+'KATX',
+'KBBX',
+'KBGM',
+'KBHX',
+'KBIS',
+'KBLX',
+'KBMX',
+'KBOX',
+'KBRO',
+'KBUF',
+'KBYX',
+'KCAE',
+'KCBW',
+'KCBX',
+'KCCX',
+'KCLE',
+'KCLX',
+'KCRI',
+'KCRP',
+'KCXX',
+'KCYS',
+'KDAX',
+'KDDC',
+'KDFX',
+'KDGX',
+'KDIX',
+'KDLH',
+'KDMX',
+'KDOX',
+'KDTX',
+'KDVN',
+'KDYX',
+'KEAX',
+'KEMX',
+'KENX',
+'KEOX',
+'KEPZ',
+'KESX',
+'KEVX',
+'KEWX',
+'KEYX',
+'KFCX',
+'KFDR',
+'KFDX',
+'KFFC',
+'KFSD',
+'KFSX',
+'KFTG',
+'KFWS',
+'KGGW',
+'KGJX',
+'KGLD',
+'KGRB',
+'KGRK',
+'KGRR',
+'KGSP',
+'KGWX',
+'KGYX',
+'KHDX',
+'KHGX',
+'KHNX',
+'KHPX',
+'KHTX',
+'KICT',
+'KICX',
+'KILN',
+'KILX',
+'KIND',
+'KINX',
+'KIWA',
+'KIWX',
+'KJAX',
+'KJGX',
+'KJKL',
+'KLBB',
+'KLCH',
+'KLGX',
+'KLIX',
+'KLNX',
+'KLOT',
+'KLRX',
+'KLSX',
+'KLTX',
+'KLVX',
+'KLWX',
+'KLZK',
+'KMAF',
+'KMAX',
+'KMBX',
+'KMHX',
+'KMKX',
+'KMLB',
+'KMOB',
+'KMPX',
+'KMQT',
+'KMRX',
+'KMSX',
+'KMTX',
+'KMUX',
+'KMVX',
+'KMXX',
+'KNKX',
+'KNQA',
+'KOAX',
+'KOHX',
+'KOKX',
+'KOTX',
+'KOUN',
+'KPAH',
+'KPBZ',
+'KPDT',
+'KPOE',
+'KPUX',
+'KRAX',
+'KRGX',
+'KRIW',
+'KRLX',
+'KRTX',
+'KSFX',
+'KSGF',
+'KSHV',
+'KSJT',
+'KSOX',
+'KSRX',
+'KTBW',
+'KTFX',
+'KTLH',
+'KTLX',
+'KTWX',
+'KTYX',
+'KUDX',
+'KUEX',
+'KVAX',
+'KVBX',
+'KVNX',
+'KVTX',
+'KVWX',
+'KYUX',
+'LPLA',
+'PABC',
+'PACG',
+'PAEC',
+'PAHG',
+'PAIH',
+'PAKC',
+'PAPD',
+'PGUA',
+'PHKI',
+'PHKM',
+'PHMO',
+'PHWA',
+'RKJK',
+'RKSG',
+'RODN',
+'TADW',
+'TATL',
+'TBNA',
+'TBOS',
+'TBWI',
+'TCLT',
+'TCMH',
+'TCVG',
+'TDAL',
+'TDAY',
+'TDCA',
+'TDEN',
+'TDFW',
+'TDTW',
+'TEWR',
+'TFLL',
+'THOU',
+'TIAD',
+'TIAH',
+'TICH',
+'TIDS',
+'TJBQ',
+'TJFK',
+'TJRV',
+'TJUA',
+'TLAS',
+'TLVE',
+'TMCI',
+'TMCO',
+'TMDW',
+'TMEM',
+'TMIA',
+'TMKE',
+'TMSP',
+'TMSY',
+'TOKC',
+'TORD',
+'TPBI',
+'TPHL',
+'TPHX',
+'TPIT',
+'TRDU',
+'TSDF',
+'TSJU',
+'TSLC',
+'TSTL',
+'TTPA',
+'TTUL']
 def goes_ui():
    
     # Check if 'key' already exists in session_state
@@ -63,12 +273,12 @@ def goes_ui():
     day_goes = d.day
     month_goes = d.month
     year_goes = d.year
-    print('day' + ':'+ str(day_goes))
-    print('month' + ':'+ str(month_goes))
+    # print('day' + ':'+ str(day_goes))
+    # print('month' + ':'+ str(month_goes))
     ## Creating date of the year:
 
     doy = day_of_year(month_goes,day_goes)
-    print('day of year' + ':'+ str(doy))
+    # print('day of year' + ':'+ str(doy))
     hour = st.selectbox(
         'Select the required Hour',
         hours_list)
@@ -85,7 +295,9 @@ def goes_ui():
     # sl_file = st.selectbox('Select the required file for Link',fo1)
     if st.button('Generate Link', key ='goes_filed_search'):
         team_link, goes_link = s3.get_geos_aws_link(station,str(year_goes),str(doy), str(hour),str(sl_file))
+        st.write('Our Link')
         st.write(team_link)
+        st.write('GOES Link')
         st.write(goes_link)
         # o_df = pd.DataFrame(data = file_output, columns = ['File Name'])
         # l = []
@@ -99,11 +311,6 @@ def goes_ui():
         # st.write(fdf)
     else:
         st.write(' ')
-
-
-
-
-
 
     ##############################################################
     st.title('Search By _FileName_ : :blue[GOES] Data')
@@ -124,7 +331,7 @@ def goes_ui():
         file_name = s3.get_aws_link_by_filename(file_input)
         st.write(file_name)
     else:
-        st.write('Look at me :::)) ')
+        st.write(' ')
 
 ## Library Imports
 import pandas as pd
@@ -133,6 +340,7 @@ import streamlit as st
 import datetime
 
 import streamlit as st
+
 
 def nexrad_ui():
 
@@ -154,13 +362,7 @@ def nexrad_ui():
     st.title('Search By _File_ : :blue[NEXRAD] Data')
     st.sidebar.markdown("# :blue[NexRad] Search")
     st.subheader("Please select your Search Criteria")
-
-    ## Data for the dropdown
-    data = [10,20,21,22,15,60]
     
-    # Create the pandas DataFrame with column name is provided explicitly
-    df = pd.DataFrame(data, columns=['Numbers'])
-    list_df = df['Numbers'].tolist()
 
     #----------------------------------------------------------
     # df = pd.read_csv('data.csv')
@@ -172,20 +374,39 @@ def nexrad_ui():
         "Select the date",
         datetime.date(2022, 7, 6))
     st.write('Your Selection is:', d)
-
+    day_nexrad = d.day
+    if(len(str(day_nexrad))==1):
+        day_nexrad = '0'+str(day_nexrad)
+    month_nexrad = d.month
+    if(len(str(month_nexrad))==1):
+        month_nexrad = '0'+str(month_nexrad)
+    year_nexrad = d.year
+    print('day' + ':'+ str(day_nexrad))
+    print('month' + ':'+ str(month_nexrad))
+    print('year'+str(year_nexrad))
 
     station = st.selectbox(
         'Select the required Station',
-        list_df)
+        station_id)
 
     st.write('You selected:', station)
+    print(str(station))
+    output_files = nexs3.get_all_nexrad_file_name_by_filter(str(year_nexrad),str(month_nexrad), str(day_nexrad),str(station))
+    # output_files = nexs3.get_all_nexrad_file_name_by_filter('2023', '02', '04', 'KABR')
+
+    print(output_files)
+    sl_file = st.selectbox('Select the required file for Link',output_files)
 
     ## Button code :
 
-    if st.button('Generate the link',key = 'nexrad_field_search'):
-        st.write(' ')
+    if st.button('Generate Link', key ='nexrad_filed_search'):
+        team_link, goes_link = nexs3.get_nexrad_aws_link(str(year_nexrad),str(month_nexrad), str(day_nexrad),str(station),str(sl_file))
+        st.write('Our Link')
+        st.write(team_link)
+        st.write('NexRad Link')
+        st.write(goes_link)
     else:
-        st.write('Look at me :::)) ')
+        st.write(' ')
 
 
 
@@ -206,9 +427,10 @@ def nexrad_ui():
     ## Button code :
 
     if st.button('Generate the link',key = 'nexrad_file_search'):
-        st.write(' ')
+        file_name = nexs3.get_nexrad_aws_link_by_filename(file_input)
+        st.write(file_name)
     else:
-        st.write('Look at me :::)) ')
+        st.write(' ')
 
 
 ## Imports
