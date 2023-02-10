@@ -144,7 +144,10 @@ def goes_ui():
             # print("yes checked")
             file_name = s3.get_aws_link_by_filename(file_input)
             # print(file_name)
-            st.write(file_name)
+            if(file_name == None):
+                st.markdown('**:red[File do not exists in Bucker]**')
+            else:
+                st.write(file_name)
         else:
            st.markdown('**:red[Input file not supported]**') 
     else:
@@ -252,7 +255,10 @@ def nexrad_ui():
         if match:
             print("yes checked")
             file_name = nexs3.get_nexrad_aws_link_by_filename(file_input)
-            st.write(file_name)
+            if file_name == None:
+                st.markdown('**:red[File not found in Database]**')
+            else:
+                st.write(file_name)
         else:
            st.markdown('**:red[Input file not supported]**')
     else:
