@@ -6,6 +6,7 @@ import botocore
 from dotenv import load_dotenv
 import re
 from data.sql_aws_metadata import Metadata
+from awscloud.cloudwatch.logger import write_nexrad_log
 
 # %%
 load_dotenv()
@@ -31,10 +32,13 @@ target_bucket = s3.Bucket(team_source_bucket)
 
 # %%
 def get_all_nexrad_file_name_by_filter(year, month, day, station):
+    write_nexrad_log(f"User requested the files for, Year: {year}, Month: {month}, Day: {day},  Station: {station}")
     files_available = []
 
     for object_summary in src_bucket.objects.filter(Prefix=f'{year}/{month}/{day}/{station}/'):
         files_available.append(object_summary.key.split('/')[-1])
+
+    write_nexrad_log(f"File fetched: \n{files_available}")
 
     return files_available
 
@@ -52,7 +56,12 @@ def get_nexrad_aws_link(year, month, day, station_id, filename):
     metadata = Metadata()
     metadata.insert_data_into_nexrad(station_id=station_id, year=year, month=month, day_of_year=day)
 
-    return f'https://damg7245-team-5.s3.amazonaws.com/{year}/{month}/{day}/{station_id}/{filename}', f'https://noaa-nexrad-level2.s3.amazonaws.com/{year}/{month}/{day}/{station_id}/{filename}'
+    generated_link = f'https://damg7245-team-5.s3.amazonaws.com/{year}/{month}/{day}/{station_id}/{filename}'
+    source_link = f'https://noaa-nexrad-level2.s3.amazonaws.com/{year}/{month}/{day}/{station_id}/{filename}'
+
+    write_nexrad_log(f"File requested: {filename}\nGenerate link: {generated_link}\nSource link: {source_link}")
+
+    return generated_link, source_link
 
 
 def get_nexrad_aws_link_by_filename(filename):
@@ -66,5 +75,7 @@ def get_nexrad_aws_link_by_filename(filename):
 
     # combining all pieces of url
     output = "https://noaa-nexrad-level2.s3.amazonaws.com/" + year + '/' + day + '/' + date + '/' + res + '/' + filename
+
+    write_nexrad_log(f"File requested: {filename}\nGOES Bucket link: {output}")
 
     return output

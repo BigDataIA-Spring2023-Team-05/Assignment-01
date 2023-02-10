@@ -6,6 +6,7 @@ import botocore
 import re
 from dotenv import load_dotenv
 from data.sql_aws_metadata import Metadata
+from awscloud.cloudwatch.logger import write_goes_log
 
 # %%
 load_dotenv()
@@ -34,10 +35,14 @@ target_bucket = s3.Bucket(team_source_bucket)
 
 # %%
 def get_all_geos_file_name_by_filter(station, year, day, hour):
+    write_goes_log(f"User requested the files for, Station: {station}, Year: {year}, Day: {day}, Hour: {hour}")
     files_available=[]
     
     for object_summary in src_bucket.objects.filter(Prefix=  f'{station}/{year}/{day}/{hour}/'):
-        files_available.append(object_summary.key.split('/')[-1])
+        file_name = object_summary.key.split('/')[-1]
+        files_available.append(file_name)
+
+    write_goes_log(f"File fetched: \n{files_available}")
 
     return files_available
 
@@ -55,7 +60,12 @@ def get_geos_aws_link(station, year, day, hour, filename):
     metadata = Metadata()
     metadata.insert_data_into_goes(station=station, year=year, day=day, hour=hour)
 
-    return f'https://damg7245-team-5.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}', f'https://noaa-goes18.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}'
+    generate_link = f'https://damg7245-team-5.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}'
+    source_link = f'https://noaa-goes18.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}'
+
+    write_goes_log(f"File requested: {filename}\nGenerate link: {generate_link}\nSource link: {source_link}")
+
+    return generate_link, source_link
 
 
 def get_aws_link_by_filename(filename):
@@ -77,5 +87,7 @@ def get_aws_link_by_filename(filename):
 
     #combining all pieces of url
     output = "https://noaa-goes18.s3.amazonaws.com/" + res + '/' + year + '/' + day + '/' + date + '/' + filename
+
+    write_goes_log(f"File requested: {filename}\nGOES Bucket link: {output}")
     
     return output
