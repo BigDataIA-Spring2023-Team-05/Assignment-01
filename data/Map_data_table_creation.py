@@ -3,6 +3,7 @@ import pandas as pd
 import re
 import streamlit as st
 import sqlite3 as sql
+from utils.logger import Log
 ### Importing MAPS DATA:
 def load_data(nrows):
     data = pd.read_fwf('https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt', nrows=nrows)
@@ -21,8 +22,8 @@ df['lat'] = data['lat']
 df['lon'] = data['lon']
 df['elev'] = data['elev']
 
-# print('Start table creation ..........................................................')
 def map_data_tbl():
+    Log().i('Creating database if not exists')
     table_name = 'Mapdata'
     conn = sql.connect('data/GOESmetadata.db')
     cursor = conn.cursor()

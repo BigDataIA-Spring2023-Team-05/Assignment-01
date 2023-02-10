@@ -1,5 +1,6 @@
 # %%
 import sqlite3 as sql
+from utils.logger import Log
 
 class Metadata:
 
@@ -43,11 +44,11 @@ class Metadata:
 
     def db_conn_close(self):
         self.conn.commit()
-        print('Data entered successfully.')
+        Log().i('Data entered successfully.')
         self.conn.close()
         if (self.conn):
             self.conn.close()
-            print("The SQLite connection is closed.")
+            Log().i("The SQLite connection is closed.")
 
     def insert_data_into_goes(self, station, year, day, hour):
         insert_str = f'INSERT INTO "{self.table_name_goes}" VALUES("{station}", "{year}", "{day}", "{hour}");'
@@ -64,7 +65,7 @@ class Metadata:
         self.cursor.execute("SELECT * FROM "+table_name)
         rows = self.cursor.fetchall()
         for row in rows:
-            print(row)
+            Log().i(row)
 
 
 # %%

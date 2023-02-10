@@ -7,11 +7,14 @@ from dotenv import load_dotenv
 import re
 from data.sql_aws_metadata import Metadata
 from awscloud.cloudwatch.logger import write_nexrad_log
+from utils.logger import Log
 
 # %%
 load_dotenv()
 
 # %%
+Log().i('Connecting... to AWS S3 bucket.')
+
 nexrad_source_bucket = 'noaa-nexrad-level2'
 team_source_bucket = os.environ.get('TARGET_BUCKET_NAME')
 
@@ -29,9 +32,14 @@ s3 = session.resource('s3')
 src_bucket = s3.Bucket(nexrad_source_bucket)
 target_bucket = s3.Bucket(team_source_bucket)
 
+Log().i('Connected to AWS S3 bucket.')
+
 
 # %%
 def get_all_nexrad_file_name_by_filter(year, month, day, station):
+    
+    Log().i(f"User requesting the files for, Station: {station}, Year: {year}, Day: {day}, Hour: {station}")
+
     write_nexrad_log(f"User requested the files for, Year: {year}, Month: {month}, Day: {day},  Station: {station}")
     files_available = []
 
@@ -46,6 +54,8 @@ def get_all_nexrad_file_name_by_filter(year, month, day, station):
 # %%
 def get_nexrad_aws_link(year, month, day, station_id, filename):
     # Stations, Year, Day, Hour
+    Log().i(f'Requesting file: {filename}')
+
     copy_source = {
         'Bucket': nexrad_source_bucket,
         'Key': f'{year}/{month}/{day}/{station_id}/{filename}'
@@ -60,11 +70,16 @@ def get_nexrad_aws_link(year, month, day, station_id, filename):
     source_link = f'https://noaa-nexrad-level2.s3.amazonaws.com/{year}/{month}/{day}/{station_id}/{filename}'
 
     write_nexrad_log(f"File requested: {filename}\nGenerate link: {generated_link}\nSource link: {source_link}")
+    
+    Log().i(f'File requested: {filename}')
+    Log().i(f'Generate link: {generated_link}')
+    Log().i(f'Source link: {source_link}')
 
     return generated_link, source_link
 
 
 def get_nexrad_aws_link_by_filename(filename):
+    write_nexrad_log(f"User requested  file: {filename}")
     y = filename.split('_')[0]
     # print(y)
     res = y[:4]
@@ -77,5 +92,8 @@ def get_nexrad_aws_link_by_filename(filename):
     output = "https://noaa-nexrad-level2.s3.amazonaws.com/" + year + '/' + day + '/' + date + '/' + res + '/' + filename
 
     write_nexrad_log(f"File requested: {filename}\nGOES Bucket link: {output}")
+    
+    Log().i(f"File requested: {filename}")
+    Log().i(f'GOES Bucket link: {output}')
 
     return output

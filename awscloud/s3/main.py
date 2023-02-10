@@ -7,6 +7,7 @@ import re
 from dotenv import load_dotenv
 from data.sql_aws_metadata import Metadata
 from awscloud.cloudwatch.logger import write_goes_log
+from utils.logger import Log
 
 # %%
 load_dotenv()
@@ -32,9 +33,11 @@ s3 = session.resource('s3')
 src_bucket = s3.Bucket(goes_source_bucket)
 target_bucket = s3.Bucket(team_source_bucket)
 
+Log().i('Connected to AWS S3 bucket.')
 
 # %%
 def get_all_geos_file_name_by_filter(station, year, day, hour):
+    Log().i(f"User requested the files for, Station: {station}, Year: {year}, Day: {day}, Hour: {hour}")
     write_goes_log(f"User requested the files for, Station: {station}, Year: {year}, Day: {day}, Hour: {hour}")
     files_available=[]
     
@@ -64,11 +67,18 @@ def get_geos_aws_link(station, year, day, hour, filename):
     source_link = f'https://noaa-goes18.s3.amazonaws.com/{station}/{year}/{day}/{hour}/{filename}'
 
     write_goes_log(f"File requested: {filename}\nGenerate link: {generate_link}\nSource link: {source_link}")
+    
+    Log().i(f'File requested: {filename}')
+    Log().i(f'Generate link: {generate_link}')
+    Log().i(f'Source link: {source_link}')
 
     return generate_link, source_link
 
 
 def get_aws_link_by_filename(filename):
+    Log().i(f"User requested  file: {filename}")
+    write_goes_log(f"User requested  file: {filename}")
+
     y = filename.split('_')
     # print(y)
     filename_pattern = r'(.*)-(.*)'
@@ -89,5 +99,8 @@ def get_aws_link_by_filename(filename):
     output = "https://noaa-goes18.s3.amazonaws.com/" + res + '/' + year + '/' + day + '/' + date + '/' + filename
 
     write_goes_log(f"File requested: {filename}\nGOES Bucket link: {output}")
-    
+   
+    Log().i(f"File requested: {filename}")
+    Log().i(f'GOES Bucket link: {output}')
+
     return output
