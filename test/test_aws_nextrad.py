@@ -53,3 +53,6 @@ def test_generating_nexrad_link_creation_by_filename():
 
 def test_generate_nexrad_link_for_specific_file():
     assert s3.get_nexrad_aws_link_by_filename('KIND20220208_005837_V06_MDM') == 'https://noaa-nexrad-level2.s3.amazonaws.com/2022/02/08/KIND/KIND20220208_005837_V06_MDM'
+
+def test_file_not_exists_but_valid_file_name():
+    assert s3.get_nexrad_aws_link_by_filename('KAMA20230202_004027_V06_MDM') == None

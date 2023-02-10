@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from data.sql_aws_metadata import Metadata
 from awscloud.cloudwatch.logger import write_goes_log
 from utils.logger import Log
+from utils import status_checker as status_check
 
 # %%
 load_dotenv()
@@ -97,6 +98,11 @@ def get_aws_link_by_filename(filename):
 
     #combining all pieces of url
     output = "https://noaa-goes18.s3.amazonaws.com/" + res + '/' + year + '/' + day + '/' + date + '/' + filename
+
+    if(status_check.getStatuscode(output) != 200):
+        Log().i('File do not exists')
+        write_goes_log(f"File requested: {filename}\nFile do not exists in GOES S3 Bucket")
+        return None
 
     write_goes_log(f"File requested: {filename}\nGOES Bucket link: {output}")
    
