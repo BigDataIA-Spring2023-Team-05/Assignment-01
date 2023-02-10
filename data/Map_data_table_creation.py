@@ -21,7 +21,7 @@ df['lat'] = data['lat']
 df['lon'] = data['lon']
 df['elev'] = data['elev']
 
-print('Start table creation ..........................................................')
+# print('Start table creation ..........................................................')
 def map_data_tbl():
     table_name = 'Mapdata'
     conn = sql.connect('data/GOESmetadata.db')
@@ -30,5 +30,6 @@ def map_data_tbl():
     cursor.execute(query)
     df.to_sql(table_name,conn,if_exists='replace',index=False)
     return conn,cursor
+
 
 

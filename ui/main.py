@@ -2,6 +2,9 @@ import streamlit as st
 import goes_ui as gu
 import nexrad_ui as nu
 import nexrad_map as nm
+import datetime
+import re
+from datetime import date
 from awscloud.s3 import main as s3
 from awscloud.s3 import nexrad_main as nexs3
 
@@ -10,6 +13,7 @@ import pandas as pd
 import numpy as mp
 import streamlit as st
 import datetime
+from datetime import date
 import streamlit as st
 def day_of_year(month, day):
         days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -17,232 +21,34 @@ def day_of_year(month, day):
         for i in range(month - 1):
             total_days += days_in_month[i]
         total_days += day
+        if(len(str(total_days))==1):
+            total_days = '00'+str(total_days)
+        elif(len(str(total_days))==2):
+            total_days = '0'+ str(total_days)
         return total_days
 hours_list = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
-station_id = ['KABR',
-'KABX',
-'KAKQ',
-'KAMA',
-'KAMX',
-'KAPX',
-'KARX',
-'KATX',
-'KBBX',
-'KBGM',
-'KBHX',
-'KBIS',
-'KBLX',
-'KBMX',
-'KBOX',
-'KBRO',
-'KBUF',
-'KBYX',
-'KCAE',
-'KCBW',
-'KCBX',
-'KCCX',
-'KCLE',
-'KCLX',
-'KCRI',
-'KCRP',
-'KCXX',
-'KCYS',
-'KDAX',
-'KDDC',
-'KDFX',
-'KDGX',
-'KDIX',
-'KDLH',
-'KDMX',
-'KDOX',
-'KDTX',
-'KDVN',
-'KDYX',
-'KEAX',
-'KEMX',
-'KENX',
-'KEOX',
-'KEPZ',
-'KESX',
-'KEVX',
-'KEWX',
-'KEYX',
-'KFCX',
-'KFDR',
-'KFDX',
-'KFFC',
-'KFSD',
-'KFSX',
-'KFTG',
-'KFWS',
-'KGGW',
-'KGJX',
-'KGLD',
-'KGRB',
-'KGRK',
-'KGRR',
-'KGSP',
-'KGWX',
-'KGYX',
-'KHDX',
-'KHGX',
-'KHNX',
-'KHPX',
-'KHTX',
-'KICT',
-'KICX',
-'KILN',
-'KILX',
-'KIND',
-'KINX',
-'KIWA',
-'KIWX',
-'KJAX',
-'KJGX',
-'KJKL',
-'KLBB',
-'KLCH',
-'KLGX',
-'KLIX',
-'KLNX',
-'KLOT',
-'KLRX',
-'KLSX',
-'KLTX',
-'KLVX',
-'KLWX',
-'KLZK',
-'KMAF',
-'KMAX',
-'KMBX',
-'KMHX',
-'KMKX',
-'KMLB',
-'KMOB',
-'KMPX',
-'KMQT',
-'KMRX',
-'KMSX',
-'KMTX',
-'KMUX',
-'KMVX',
-'KMXX',
-'KNKX',
-'KNQA',
-'KOAX',
-'KOHX',
-'KOKX',
-'KOTX',
-'KOUN',
-'KPAH',
-'KPBZ',
-'KPDT',
-'KPOE',
-'KPUX',
-'KRAX',
-'KRGX',
-'KRIW',
-'KRLX',
-'KRTX',
-'KSFX',
-'KSGF',
-'KSHV',
-'KSJT',
-'KSOX',
-'KSRX',
-'KTBW',
-'KTFX',
-'KTLH',
-'KTLX',
-'KTWX',
-'KTYX',
-'KUDX',
-'KUEX',
-'KVAX',
-'KVBX',
-'KVNX',
-'KVTX',
-'KVWX',
-'KYUX',
-'LPLA',
-'PABC',
-'PACG',
-'PAEC',
-'PAHG',
-'PAIH',
-'PAKC',
-'PAPD',
-'PGUA',
-'PHKI',
-'PHKM',
-'PHMO',
-'PHWA',
-'RKJK',
-'RKSG',
-'RODN',
-'TADW',
-'TATL',
-'TBNA',
-'TBOS',
-'TBWI',
-'TCLT',
-'TCMH',
-'TCVG',
-'TDAL',
-'TDAY',
-'TDCA',
-'TDEN',
-'TDFW',
-'TDTW',
-'TEWR',
-'TFLL',
-'THOU',
-'TIAD',
-'TIAH',
-'TICH',
-'TIDS',
-'TJBQ',
-'TJFK',
-'TJRV',
-'TJUA',
-'TLAS',
-'TLVE',
-'TMCI',
-'TMCO',
-'TMDW',
-'TMEM',
-'TMIA',
-'TMKE',
-'TMSP',
-'TMSY',
-'TOKC',
-'TORD',
-'TPBI',
-'TPHL',
-'TPHX',
-'TPIT',
-'TRDU',
-'TSDF',
-'TSJU',
-'TSLC',
-'TSTL',
-'TTPA',
-'TTUL']
+sd = pd.read_fwf('https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt')
+sd = sd.drop(index = 0,axis = 0)
+station_id = sd['ICAO'].astype(str).to_list()
+# print(sd)
+# print(station_id)
+# print(type(station_id))
+
 def goes_ui():
    
-    # Check if 'key' already exists in session_state
-    # If not, then initialize it
-    if 'key' not in st.session_state:
-        st.session_state['key'] = 'value'
+    # # Check if 'key' already exists in session_state
+    # # If not, then initialize it
+    # if 'key' not in st.session_state:
+    #     st.session_state['key'] = 'value'
 
-    # Session State also supports the attribute based syntax
-    if 'key' not in st.session_state:
-        st.session_state.key = 'value'
+    # # Session State also supports the attribute based syntax
+    # if 'key' not in st.session_state:
+    #     st.session_state.key = 'value'
 
-    # Store the initial value of widgets in session state
-    if "visibility" not in st.session_state:
-        st.session_state.visibility = "visible"
-        st.session_state.disabled = False
+    # # Store the initial value of widgets in session state
+    # if "visibility" not in st.session_state:
+    #     st.session_state.visibility = "visible"
+    #     st.session_state.disabled = False
 
     # st.title('This is a title')
     st.title('Search By _File_ : :blue[GOES] Data')
@@ -268,7 +74,8 @@ def goes_ui():
     st.write('You selected:', station)
     d = st.date_input(
         "Select the date",
-        datetime.date(2022, 7, 6))
+        value = datetime.date(2022, 7, 28),
+        min_value= datetime.date(2022, 7, 28), max_value=date.today())
     st.write('Your Selection is:', d)
     day_goes = d.day
     month_goes = d.month
@@ -285,6 +92,15 @@ def goes_ui():
 
     st.write('You selected:', hour)
     output_files = s3.get_all_geos_file_name_by_filter(station, str(year_goes),str(doy), str(hour))
+    # print(output_files)
+
+
+
+    if not output_files:
+        st.markdown('**:red[data NOT available for given Inputs]**')
+    else:
+        st.write('')
+    
     sl_file = st.selectbox('Select the required file for Link',output_files)
     ## Button code :
 
@@ -318,18 +134,19 @@ def goes_ui():
     # Text input :
 
     file_input = st.text_input('File Name','' )
-
-
-    if file_input:
-            st.write("File name entered: ", file_input)
-    else:
-            st.write('')
+   
 
     ## Button code :
-
+    regex = re.compile(r'(OR)_(ABI)-(L\d+b)-(Rad[A-Z]?)-([A-Z]\dC\d{2})_(G\d+)_(s\d{14})_(e\d{14})_(c\d{14}).nc')
+    match = regex.match(file_input)
     if st.button('Generate the link',key = 'goes_file_search'):
-        file_name = s3.get_aws_link_by_filename(file_input)
-        st.write(file_name)
+        if match:
+            # print("yes checked")
+            file_name = s3.get_aws_link_by_filename(file_input)
+            # print(file_name)
+            st.write(file_name)
+        else:
+           st.markdown('**:red[Input file not supported]**') 
     else:
         st.write(' ')
 
@@ -346,17 +163,17 @@ def nexrad_ui():
 
     # Check if 'key' already exists in session_state
     # If not, then initialize it
-    if 'key' not in st.session_state:
-        st.session_state['key'] = 'value'
+    # if 'key' not in st.session_state:
+    #     st.session_state['key'] = 'value'
 
-    # Session State also supports the attribute based syntax
-    if 'key' not in st.session_state:
-        st.session_state.key = 'value'
+    # # Session State also supports the attribute based syntax
+    # if 'key' not in st.session_state:
+    #     st.session_state.key = 'value'
 
-    # Store the initial value of widgets in session state
-    if "visibility" not in st.session_state:
-        st.session_state.visibility = "visible"
-        st.session_state.disabled = False
+    # # Store the initial value of widgets in session state
+    # if "visibility" not in st.session_state:
+    #     st.session_state.visibility = "visible"
+    #     st.session_state.disabled = False
 
     # st.title('This is a title')
     st.title('Search By _File_ : :blue[NEXRAD] Data')
@@ -372,7 +189,8 @@ def nexrad_ui():
 
     d = st.date_input(
         "Select the date",
-        datetime.date(2022, 7, 6))
+        value = datetime.date(2023, 2, 4),
+        min_value= datetime.date(2022, 1, 1), max_value=date.today())
     st.write('Your Selection is:', d)
     day_nexrad = d.day
     if(len(str(day_nexrad))==1):
@@ -381,20 +199,23 @@ def nexrad_ui():
     if(len(str(month_nexrad))==1):
         month_nexrad = '0'+str(month_nexrad)
     year_nexrad = d.year
-    print('day' + ':'+ str(day_nexrad))
-    print('month' + ':'+ str(month_nexrad))
-    print('year'+str(year_nexrad))
+    # print('day' + ':'+ str(day_nexrad))
+    # print('month' + ':'+ str(month_nexrad))
+    # print('year'+str(year_nexrad))
 
     station = st.selectbox(
         'Select the required Station',
         station_id)
 
     st.write('You selected:', station)
-    print(str(station))
+    # print(str(station))
     output_files = nexs3.get_all_nexrad_file_name_by_filter(str(year_nexrad),str(month_nexrad), str(day_nexrad),str(station))
     # output_files = nexs3.get_all_nexrad_file_name_by_filter('2023', '02', '04', 'KABR')
-
-    print(output_files)
+    if not output_files:
+        st.markdown('**:red[data NOT available for given Inputs]**')
+    else:
+        st.write('')
+    # print(output_files)
     sl_file = st.selectbox('Select the required file for Link',output_files)
 
     ## Button code :
@@ -425,10 +246,15 @@ def nexrad_ui():
             st.write('')
 
     ## Button code :
-
+    regex = re.compile(r'K[A-Z]{3}[0-9]{8}_[0-9]{6}(_V06_MDM)?')
+    match = regex.match(file_input)
     if st.button('Generate the link',key = 'nexrad_file_search'):
-        file_name = nexs3.get_nexrad_aws_link_by_filename(file_input)
-        st.write(file_name)
+        if match:
+            print("yes checked")
+            file_name = nexs3.get_nexrad_aws_link_by_filename(file_input)
+            st.write(file_name)
+        else:
+           st.markdown('**:red[Input file not supported]**')
     else:
         st.write(' ')
 
@@ -489,8 +315,6 @@ def nexrad_map():
                 subunitwidth = 0.5
             ),
         )
-    # Plot!
-    st.plotly_chart(fig, use_container_width=False)
     # Plot!
     st.plotly_chart(fig, use_container_width=False)
 
