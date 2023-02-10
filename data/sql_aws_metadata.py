@@ -8,6 +8,7 @@ def create_database():
 def create_table_goes(cursor, table_name):
     # create sql lite 3 database
     cursor.execute(''' CREATE TABLE IF EXISTS '''+ table_name + ''' (
+             station VARCHAR NOT NULL,
              year INTEGER NOT NULL,
              day INTEGER NOT NULL,
              hour INTEGER NOT NULL
@@ -16,10 +17,10 @@ def create_table_goes(cursor, table_name):
 def create_table_nexrad(cursor, table_name):
     # create sql lite 3 database
     cursor.execute(''' CREATE TABLE IF EXISTS '''+ table_name + ''' (
-             station_id INTEGER NOT NULL,
              year INTEGER NOT NULL,
+             month INTEGER NOT NULL,
              day INTEGER NOT NULL,
-             hour INTEGER NOT NULL
+             station_id INTEGER NOT NULL
              ); ''')
 
 
