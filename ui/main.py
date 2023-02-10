@@ -7,6 +7,7 @@ import re
 from datetime import date
 from awscloud.s3 import main as s3
 from awscloud.s3 import nexrad_main as nexs3
+from utils.logger import Log
 
 ## Library Imports
 import pandas as pd
@@ -15,6 +16,7 @@ import streamlit as st
 import datetime
 from datetime import date
 import streamlit as st
+
 def day_of_year(month, day):
         days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         total_days = 0
@@ -80,6 +82,10 @@ def goes_ui():
     day_goes = d.day
     month_goes = d.month
     year_goes = d.year
+    Log().i(day_goes)
+    Log().i(month_goes)
+    Log().i(year_goes)
+
     # print('day' + ':'+ str(day_goes))
     # print('month' + ':'+ str(month_goes))
     ## Creating date of the year:
@@ -102,6 +108,7 @@ def goes_ui():
         st.write('')
     
     sl_file = st.selectbox('Select the required file for Link',output_files)
+    Log().i(sl_file)
     ## Button code :
 
     # if st.button('Search',key = 'goes_file_output'):
@@ -134,7 +141,7 @@ def goes_ui():
     # Text input :
 
     file_input = st.text_input('File Name','' )
-   
+    Log().i(file_input)
 
     ## Button code :
     regex = re.compile(r'(OR)_(ABI)-(L\d+b)-(Rad[A-Z]?)-([A-Z]\dC\d{2})_(G\d+)_(s\d{14})_(e\d{14})_(c\d{14}).nc')
@@ -205,10 +212,14 @@ def nexrad_ui():
     # print('day' + ':'+ str(day_nexrad))
     # print('month' + ':'+ str(month_nexrad))
     # print('year'+str(year_nexrad))
+    Log().i(day_nexrad)
+    Log().i(month_nexrad)
+    Log().i(year_nexrad)
 
     station = st.selectbox(
         'Select the required Station',
         station_id)
+    Log().i(station)
 
     st.write('You selected:', station)
     # print(str(station))
@@ -220,7 +231,7 @@ def nexrad_ui():
         st.write('')
     # print(output_files)
     sl_file = st.selectbox('Select the required file for Link',output_files)
-
+    Log().i(sl_file)
     ## Button code :
 
     if st.button('Generate Link', key ='nexrad_filed_search'):
@@ -253,7 +264,7 @@ def nexrad_ui():
     match = regex.match(file_input)
     if st.button('Generate the link',key = 'nexrad_file_search'):
         if match:
-            print("yes checked")
+            Log().i("yes checked")
             file_name = nexs3.get_nexrad_aws_link_by_filename(file_input)
             if file_name == None:
                 st.markdown('**:red[File not found in Database]**')
