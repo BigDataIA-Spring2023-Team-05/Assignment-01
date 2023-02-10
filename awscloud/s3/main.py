@@ -5,6 +5,7 @@ import boto3.s3
 import botocore
 import re
 from dotenv import load_dotenv
+from data.sql_aws_metadata import Metadata
 
 # %%
 load_dotenv()
@@ -37,6 +38,9 @@ def get_all_geos_file_name_by_filter(station, year, day, hour):
     
     for object_summary in src_bucket.objects.filter(Prefix=  f'{station}/{year}/{day}/{hour}/'):
         files_available.append(object_summary.key.split('/')[-1])
+
+    metadata = Metadata()
+    metadata.insert_data_into_goes(station= station, year=year, day=day, hour=hour)
 
     return files_available
 

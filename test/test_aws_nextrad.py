@@ -49,3 +49,7 @@ def test_generating_nexrad_link_creation_by_filename():
         generated_links.append(s3.get_nexrad_aws_link_by_filename(file))
 
     assert generated_links == generated_links_expected
+
+
+def test_generate_nexrad_link_for_specific_file():
+    assert s3.get_nexrad_aws_link_by_filename('KIND20220208_005837_V06_MDM') == 'https://noaa-nexrad-level2.s3.amazonaws.com/2022/02/08/KIND/KIND20220208_005837_V06_MDM'

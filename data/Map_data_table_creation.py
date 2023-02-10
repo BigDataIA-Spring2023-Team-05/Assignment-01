@@ -24,7 +24,7 @@ df['elev'] = data['elev']
 print('Start table creation ..........................................................')
 def map_data_tbl():
     table_name = 'Mapdata'
-    conn = sql.connect('GOESmetadata.db')
+    conn = sql.connect('data/GOESmetadata.db')
     cursor = conn.cursor()
     query = f'Create table if not Exists {table_name} (Name,County,Lat,Lon,Elev)'
     cursor.execute(query)

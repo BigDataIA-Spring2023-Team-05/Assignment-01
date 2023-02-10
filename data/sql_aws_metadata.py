@@ -1,47 +1,76 @@
+# %%
 import sqlite3 as sql
 
-def create_database():
-    conn = sql.connect(database_name)
-    cursor = conn.cursor()
-    return conn, cursor
+class Metadata:
 
-def create_table_goes(cursor, table_name):
-    # create sql lite 3 database
-    cursor.execute(''' CREATE TABLE IF EXISTS '''+ table_name + ''' (
-             station VARCHAR NOT NULL,
-             year INTEGER NOT NULL,
-             day INTEGER NOT NULL,
-             hour INTEGER NOT NULL
-             ); ''')
+    def __init__(self):
+        self.database_name = 'data/metadata_storage.db'
+        self.table_name_goes = 'goes_metadata'
+        self.table_name_nexrad = 'nexrad_metadata'
 
-def create_table_nexrad(cursor, table_name):
-    # create sql lite 3 database
-    cursor.execute(''' CREATE TABLE IF EXISTS '''+ table_name + ''' (
-             year INTEGER NOT NULL,
-             month INTEGER NOT NULL,
-             day INTEGER NOT NULL,
-             station_id INTEGER NOT NULL
-             ); ''')
+        # creating the database
+        self.conn = sql.connect(self.database_name)
+        self.cursor = self.conn.cursor()
+
+        self.create_table_goes()
+        self.create_table_nexrad()
+
+    # def __del__(self):
+    #     self.db_conn_close()
+
+    # def create_database(self):
+    #     conn = sql.connect(self.database_name)
+    #     cursor = conn.cursor()
+    #     return conn, cursor
+
+    def create_table_goes(self):
+        # create sql lite 3 database
+        self.cursor.execute(''' CREATE TABLE IF NOT EXISTS '''+ self.table_name_goes + ''' (
+                station VARCHAR NOT NULL,
+                year INTEGER NOT NULL,
+                day INTEGER NOT NULL,
+                hour INTEGER NOT NULL
+                ); ''')
+
+    def create_table_nexrad(self):
+        # create sql lite 3 database
+        self.cursor.execute(''' CREATE TABLE IF NOT EXISTS '''+ self.table_name_nexrad + ''' (
+                year INTEGER NOT NULL,
+                month INTEGER NOT NULL,
+                day_of_year INTEGER NOT NULL,
+                station_id INTEGER NOT NULL
+                ); ''')
+
+    def db_conn_close(self):
+        self.conn.commit()
+        print('Data entered successfully.')
+        self.conn.close()
+        if (self.conn):
+            self.conn.close()
+            print("The SQLite connection is closed.")
+
+    def insert_data_into_goes(self, station, year, day, hour):
+        insert_str = f'INSERT INTO "{self.table_name_goes}" VALUES("{station}", "{year}", "{day}", "{hour}");'
+        self.cursor.execute(insert_str)
+        self.db_conn_close()
 
 
-def print_and_validate_data(cursor, table_name):
-    cursor.execute("SELECT * FROM "+table_name)
-    rows = cursor.fetchall()
-    for row in rows:
-        print(row)
+    def insert_data_into_nexrad(self, year, day_of_year, hour, station_id):
+        insert_str = f'INSERT INTO "{self.table_name_nexrad}" VALUES("{year}", "{day_of_year}", "{hour}", {station_id}");'
+        self.cursor.execute(insert_str)
+        self.db_conn_close()
 
-def db_conn_close(conn):
-    conn.commit()
-    print('Data entered successfully.')
-    conn.close()
-    if (conn):
-        conn.close()
-        print("The SQLite connection is closed.")
+    def print_and_validate_data(self, table_name):
+        self.cursor.execute("SELECT * FROM "+table_name)
+        rows = self.cursor.fetchall()
+        for row in rows:
+            print(row)
 
-database_name = 'metadata_storage'
-table_name_goes = 'goes_metadata'
-table_name_nexrad = 'goes_metadata'
-conn, cursor = create_database(table_name_goes)
-create_table_goes(conn, cursor, table_name_goes)
-create_table_nexrad(conn, cursor, table_name_nexrad)
-db_conn_close(conn)
+
+# %%
+
+# metadata = Metadata()
+# metadata.print_and_validate_data('goes_metadata')
+
+
+# %%
