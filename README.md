@@ -51,7 +51,7 @@ ER Diagram for the SQL database tables - GOES metadata and NEXRAD metadata - whi
 ## How to run this project:
 1. Clone this repo locally `git clone <repo-url>`
 
-2. Setup the local python enviornment.
+2. Setup the local python enviornment. You can refer this link [How to setup python enviornment?](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/ "How to setup python enviornment?")
 
 3. Install all the dependencies from the requirements.txt file
 `pip install -r requirements.txt`
@@ -61,5 +61,13 @@ ER Diagram for the SQL database tables - GOES metadata and NEXRAD metadata - whi
 
 5. Create `.env` file under awscloud folder
 
-6. Run the streamlit project
+6. Specify these key and values pair in your .env
+
+`AWS_ACCESS_KEY=<value>`
+
+`AWS_ACCESS_KEY_SECRET=<value>`
+
+`TARGET_BUCKET_NAME=<value>` # Target bucket name for GOES in S3 Bucket.
+
+8. Run the streamlit project
 `streamlit run ui/main.py`
